@@ -1,0 +1,39 @@
+set_volume_up:
+  description: 增加音量.
+  fields:
+    entity_id:
+      description: Name(s) of the entities to set
+      example: 'xiaoai_hook.public'
+set_volume_down:
+  description: 降低音量.
+  fields:
+    entity_id:
+      description: Name(s) of the entities to set
+      example: 'xiaoai_hook.public'
+set_volume:
+  description: 设置音量.
+  fields:
+    entity_id:
+      description: Name(s) of the entities to set
+      example: 'xiaoai_hook.public'
+    color:
+      description: 0 - 100
+      example: '0'
+xiaoai_tts:
+  description: TTS语音播报.
+  fields:
+    entity_id:
+      description: Name(s) of the entities to set
+      example: 'xiaoai_hook.public'
+    color:
+      description: 任意字符串
+      example: '你好'
+play_control:
+  description: 播放控制.
+  fields:
+    entity_id:
+      description: Name(s) of the entities to set
+      example: 'xiaoai_hook.public'
+    color:
+      description: {"ch", "prev", "next", "play", "pause", "toggle", "resume"}
+      example: 'toggle'
