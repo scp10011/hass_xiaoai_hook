@@ -1,12 +1,15 @@
 import asyncio
 import json
 import logging
+from datetime import timedelta
 
 import voluptuous as vol
 
+from homeassistant.loader import bind_hass
 from homeassistant.const import STATE_ON, STATE_OFF
 from homeassistant.components.http import HomeAssistantView
 from homeassistant.helpers.entity import Entity
+from homeassistant.helpers.entity_component import EntityComponent
 from homeassistant.const import (
     CONF_NAME,
     CONF_HOST,
@@ -26,6 +29,8 @@ CONF_KEYWORD = "keyword"
 _keyword = None
 _hass = None
 ATTR_MODEL = "model"
+SCAN_INTERVAL = timedelta(seconds=10)
+ENTITY_ID_FORMAT = DOMAIN + ".{}"
 
 METHOD = {"ch", "prev", "next", "play", "pause", "toggle", "resume"}
 
@@ -54,13 +59,35 @@ SERVICE_TO_METHOD = {
 }
 
 
+@bind_hass
+def is_on(hass, entity_id: str = None) -> bool:
+    if hass.states.get(entity_id):
+        return True
+    else:
+        return False
+
+
 async def async_setup(hass, config):
+    """Set up the Xiaoai component."""
     global _hass, _keyword
     _hass = hass
+    component = hass.data[DOMAIN] = EntityComponent(
+        _LOGGER, DOMAIN, hass, SCAN_INTERVAL
+    )
     XiaoaiKeyword.keyword = config[DOMAIN].get(CONF_KEYWORD, "")
-    _LOGGER.error("xiaoai")
     hass.http.register_view(XiaoaiKeyword)
+    await component.async_setup(config)
     return True
+
+
+async def async_setup_entry(hass, entry):
+    """Set up a config entry."""
+    return await hass.data[DOMAIN].async_setup_entry(entry)
+
+
+async def async_unload_entry(hass, entry):
+    """Unload a config entry."""
+    return await hass.data[DOMAIN].async_unload_entry(entry)
 
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
